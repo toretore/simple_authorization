@@ -1,0 +1,5 @@
+Description:
+  Create role migration
+
+Example:
+    ./script/generate simple_authorization --migration Role
