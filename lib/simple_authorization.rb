@@ -1,1 +1,1 @@
-# SimpleAuthorization
+require 'simple_authorization/controller_methods'
