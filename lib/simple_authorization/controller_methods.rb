@@ -4,9 +4,9 @@ module SimpleAuthorization
     module Application
 
       def self.included(controller)
+        controller.extend ClassMethods
         controller.class_inheritable_accessor :required_roles
         controller.required_roles = []
-        controller.extend ClassMethods
         controller.before_filter :authorize
       end
 
@@ -17,6 +17,12 @@ module SimpleAuthorization
       end
 
       def authorize_roles
+        #Authorization fails if one or more roles are required and there is no current_user
+        if self.class.required_roles.any? && !current_user
+          authorization_failed
+          return
+        end
+
         self.class.required_roles.each do |roles|
           options = roles.last.is_a?(Hash) ? roles.last : {}
 

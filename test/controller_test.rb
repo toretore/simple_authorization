@@ -41,6 +41,7 @@ class ClassMethodsTest < Test::Unit::TestCase
     assert_equal [[:foo]], child.required_roles
     child.require_roles :bar, :except => :baz
     assert_equal [[:foo], [:bar, {:except => :baz}]], child.required_roles
+    assert_equal [[:foo]], parent.required_roles
   end
 
   def test_forget_roles_should_clear_out_the_required_roles_array
@@ -63,6 +64,7 @@ class InstanceMethodsTest < Test::Unit::TestCase
   def setup
     @kontroller = Class.new(ApplicationController)
     @controller = @kontroller.new
+    @controller.current_user = stub("User")
   end
 
   def test_authorize_roles_should_not_call_authorization_failed_when_required_roles_empty
@@ -143,6 +145,19 @@ class InstanceMethodsTest < Test::Unit::TestCase
   def test_authorization_actions_should_arrayify_and_stringify_parameters
     assert_equal ["foo"], @controller.send(:authorization_actions, :foo)
     assert_equal ["foo", "bar"], @controller.send(:authorization_actions, [:foo, "bar"])
+  end
+
+  def test_authorize_roles_should_call_authorization_failed_when_no_current_user
+    @controller.current_user = nil
+    @kontroller.required_roles = [[:foo]]
+    @controller.expects(:authorization_failed)
+    @controller.send(:authorize_roles)
+  end
+
+  def test_authorize_roles_should_not_call_authorization_failed_when_no_current_user_and_no_required_roles
+    @controller.current_user = nil
+    @controller.expects(:authorization_failed).never
+    @controller.send(:authorize_roles)
   end
 
 end
