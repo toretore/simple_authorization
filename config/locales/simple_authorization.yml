@@ -1,0 +1,3 @@
+en:
+  simple_authorization:
+    authorization_failed: "You're not authorized to view this page"
