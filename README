@@ -1,13 +1,38 @@
 SimpleAuthorization
 ===================
 
-Introduction goes here.
+* Install
+* Unless "roles" table already exists or do not want:
+  * script/generate simple_authorization --migration Role
+  * rake db:migrate
+* User.has_many(:roles)
+* Include SimpleAuthorization::ModelMethods::User in User
 
 
 Example
 =======
 
-Example goes here.
+#No roles:
+class AdminController < ApplicationController
 
+private
 
-Copyright (c) 2009 [name of plugin creator], released under the MIT license
+  #Authorize is where authorization happens. Override to define
+  #what that means for a particular controller. The default implementation
+  #is to check whether current_user has the roles required by the
+  #controller/action, and nothing will happen if no roles are required
+  def authorize
+    redirect_to login_url unless current_user.admin?
+  end
+
+end
+
+#Using the built-in role system
+class ArticlesController < ApplicationController
+
+  require_roles :admin, :only => [:destroy]
+  require_roles :editor, :only => [:new, :edit, :create, :update]
+
+end
+
+Copyright (c) 2009 Tore Darell, released under the MIT license
