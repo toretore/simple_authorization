@@ -8,6 +8,7 @@ module SimpleAuthorization
         controller.class_inheritable_accessor :required_roles
         controller.required_roles = []
         controller.before_filter :authorize
+        [:has_roles?, :has_role?].each{|m| controller.helper_method m }
       end
 
     private
@@ -37,6 +38,10 @@ module SimpleAuthorization
 
       def has_roles?(*roles)
         current_user.has_roles?(*roles)
+      end
+
+      def has_role?(role)
+        has_roles?(role)
       end
 
       def authorization_failed
